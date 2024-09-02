@@ -1,20 +1,23 @@
 ﻿namespace ProgrammingAnalystExercise
 {
-    public class Library
+   public class Library
     {
-        private List<Book> books = new List<Book>();
+        private List<Book> books;
 
-        public Library()
+        public Library(List<Book> initialBooks)
         {
-            books.Add(new Book("The Great Gatsby"));
-            books.Add(new Book("1984"));
-            books.Add(new Book("To Kill a Mockingbird"));
+            books = initialBooks;
         }
 
         public void AddBook(Book book)
         {
+            if (book == null)
+            {
+                throw new ArgumentNullException(nameof(book), "Cannot add a null book.");
+            }
+
             books.Add(book);
-            Console.WriteLine($"The book {book.Title} has been added to the Library");
+            Console.WriteLine($"The book '{book.Title}' has been added to the Library");
         }
 
         public void BorrowBook(string title)
@@ -22,7 +25,14 @@
             var book = FindBook(title);
             if (book != null)
             {
-                book.Borrow();
+                if (!book.IsBorrowed)
+                {
+                    book.Borrow();
+                }
+                else
+                {
+                    Console.WriteLine($"The book '{title}' is already checked out.");
+                }
             }
             else
             {
@@ -35,7 +45,14 @@
             var book = FindBook(title);
             if (book != null)
             {
-                book.Return();
+                if (book.IsBorrowed)
+                {
+                    book.Return();
+                }
+                else
+                {
+                    Console.WriteLine($"The book '{title}' was not borrowed.");
+                }
             }
             else
             {
@@ -57,16 +74,10 @@
             }
         }
 
-        private Book? FindBook(string title)
+        private Book FindBook(string title)
         {
-            foreach (var book in books)
-            {
-                if (book.Title == title)
-                {
-                    return book;
-                }
-            }
-            return new Book(title);
+            return books.Find(b => b.Title == title);
         }
     }
+
 }
